@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="צ׳קליסט מטבח">
+<meta name="theme-color" content="#c9a96e">
+<title>Kitchen Checklist</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap');
+:root{--bg:#1a1714;--card:#242019;--accent:#c9a96e;--accent-dim:#8a7245;--text:#e8e0d4;--dim:#9a9080;--border:#3a3428;--green:#5a9a5a;--green-bg:#2a3a28;--red:#c47a6a;--red-bg:#3a2828;--blue:#6a8fb5;--blue-bg:#28303a;--yellow:#d4a843;--yellow-bg:#3a3520;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;padding:calc(12px + var(--safe-top)) 14px calc(80px + var(--safe-bottom));-webkit-font-smoothing:antialiased;}
+.wrap{max-width:600px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}.header small{font-size:11px;letter-spacing:5px;color:var(--accent-dim);text-transform:uppercase;}.header h1{font-size:20px;font-weight:300;color:var(--accent);margin-top:2px;}.header .sub{font-size:13px;color:var(--dim);margin-top:4px;}
+.btn{background:var(--accent);color:var(--bg);border:none;border-radius:10px;padding:12px 28px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Heebo',sans-serif;transition:all .15s;width:100%;}.btn:active{transform:scale(.97);opacity:.9;}.btn:disabled{opacity:.4;transform:none;cursor:not-allowed;}.btn-outline{background:transparent;color:var(--accent);border:1px solid var(--accent);}.btn-sm{padding:8px 16px;font-size:13px;width:auto;}.btn-red{background:var(--red);color:#fff;}.btn-green{background:var(--green);color:#fff;}.btn-blue{background:var(--blue);color:#fff;}
+.input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;padding:10px 14px;outline:none;font-family:'Heebo',sans-serif;}.input:focus{border-color:var(--accent);}.input-sm{padding:8px 10px;font-size:13px;}
+select.input{appearance:none;-webkit-appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239a9080' viewBox='0 0 16 16'%3E%3Cpath d='m8 11-5-5h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:left 12px center;}
+.label{font-size:12px;color:var(--dim);margin-bottom:4px;display:block;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;}.card-title{font-size:15px;font-weight:600;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.tabs{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;}.tab{background:transparent;color:var(--dim);border:1px solid var(--border);border-radius:10px;padding:9px 14px;font-size:12px;cursor:pointer;font-family:'Heebo',sans-serif;white-space:nowrap;flex-shrink:0;transition:all .15s;}.tab.active{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:600;}
+.setup{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;}.setup h2{font-size:18px;color:var(--accent);margin-bottom:16px;font-weight:400;}.setup .hint{font-size:12px;color:var(--dim);margin-bottom:16px;line-height:1.6;}
+.loading{text-align:center;padding:40px;color:var(--dim);}.loading .spin{display:inline-block;width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-state{text-align:center;padding:40px;color:var(--dim);}.empty-state .icon{font-size:40px;margin-bottom:12px;}
+.section-divider{height:1px;background:var(--border);margin:16px 0;}
+/* Progress */
+.progress-bar-wrap{height:6px;background:var(--border);border-radius:3px;margin-bottom:16px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:var(--green);border-radius:3px;transition:width .4s ease;}
+.progress-label{font-size:12px;color:var(--dim);text-align:center;margin-bottom:6px;}.progress-label strong{color:var(--accent);}
+/* Type selector */
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.type-card{background:var(--card);border:2px solid var(--border);border-radius:16px;padding:24px 16px;text-align:center;cursor:pointer;transition:all .2s;}.type-card:active{transform:scale(.97);}.type-card.selected{border-color:var(--accent);background:#2a2418;}
+.type-card .type-icon{font-size:32px;margin-bottom:8px;}.type-card .type-name{font-size:16px;font-weight:600;color:var(--accent);}.type-card .type-sub{font-size:11px;color:var(--dim);margin-top:4px;}
+/* Task item */
+.task-item{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden;transition:border-color .2s;}
+.task-item.done{border-color:var(--green);}
+.task-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;}
+.task-check{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:13px;}
+.task-item.done .task-check{background:var(--green);border-color:var(--green);color:#fff;}
+.task-name{flex:1;font-size:15px;font-weight:500;}
+.task-badge{font-size:11px;padding:3px 8px;border-radius:6px;background:var(--blue-bg);color:var(--blue);flex-shrink:0;}
+.task-body{padding:0 16px 14px;border-top:1px solid var(--border);}
+/* Photo upload */
+.photo-area{margin-top:12px;}
+.photo-preview{width:100%;max-height:200px;object-fit:cover;border-radius:10px;margin-bottom:10px;display:none;}
+.photo-preview.visible{display:block;}
+.upload-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--blue-bg);border:1.5px dashed var(--blue);border-radius:10px;padding:14px;cursor:pointer;width:100%;font-family:'Heebo',sans-serif;font-size:14px;color:var(--blue);transition:all .15s;}.upload-btn:active{opacity:.8;}
+.upload-btn.uploading{opacity:.6;pointer-events:none;}
+.upload-spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--blue-bg);border-top-color:var(--blue);border-radius:50%;animation:spin .6s linear infinite;}
+/* Greeting */
+.greeting{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:16px;text-align:center;}.greeting .name{font-size:22px;font-weight:600;color:var(--accent);}.greeting .info{font-size:13px;color:var(--dim);margin-top:4px;}
+/* Submit bar */
+.submit-bar{position:fixed;bottom:0;left:0;right:0;padding:10px 14px calc(10px + var(--safe-bottom));background:linear-gradient(transparent,var(--bg) 30%);z-index:50;}.submit-bar .inner{max-width:600px;margin:0 auto;}
+/* Admin - today summary */
+.summary-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);}.summary-row:last-child{border-bottom:none;}
+.summary-avatar{width:36px;height:36px;border-radius:50%;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--bg);flex-shrink:0;}
+.summary-name{flex:1;font-size:15px;font-weight:600;}
+.summary-badges{display:flex;gap:6px;}
+.badge{font-size:11px;padding:4px 8px;border-radius:7px;font-weight:600;cursor:pointer;}
+.badge.done{background:var(--green-bg);color:var(--green);border:1px solid var(--green);}
+.badge.missing{background:var(--red-bg);color:var(--red);border:1px solid var(--red);}
+.badge.inprog{background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow);}
+/* History */
+.hist-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:border-color .15s;}.hist-item:active{border-color:var(--accent);}
+.hist-item-head{display:flex;align-items:center;gap:10px;}.hist-name{font-size:15px;font-weight:600;flex:1;}.hist-time{font-size:11px;color:var(--dim);}
+.hist-type{font-size:11px;padding:3px 8px;border-radius:6px;font-weight:600;}
+.hist-type.open{background:var(--blue-bg);color:var(--blue);}
+.hist-type.close{background:var(--yellow-bg);color:var(--yellow);}
+/* Photo gallery */
+.photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+.photo-tile{border-radius:10px;overflow:hidden;border:1px solid var(--border);}
+.photo-tile img{width:100%;height:120px;object-fit:cover;display:block;}
+.photo-tile-label{font-size:11px;padding:4px 8px;color:var(--dim);background:var(--card);}
+/* Tasks management */
+.task-manage-row{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);}.task-manage-row:last-child{border-bottom:none;}
+.task-manage-name{flex:1;font-size:14px;}
+.task-type-pill{font-size:10px;padding:2px 7px;border-radius:6px;background:var(--blue-bg);color:var(--blue);}
+/* Toggle */
+.toggle{width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}.toggle.on{background:var(--green);}.toggle.off{background:var(--border);}.toggle::after{content:'';position:absolute;top:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:all .2s;}.toggle.on::after{right:2px;}.toggle.off::after{left:2px;}
+/* Emp list (settings) */
+.emp-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
+.emp-avatar{width:34px;height:34px;border-radius:50%;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--bg);flex-shrink:0;}
+.emp-info{flex:1;}.emp-name{font-size:14px;font-weight:600;}.emp-code{font-size:11px;color:var(--dim);font-family:monospace;letter-spacing:1px;}
+.emp-del{color:var(--red);cursor:pointer;font-size:18px;padding:4px 8px;flex-shrink:0;}
+/* Live badge */
+.live-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--dim);background:var(--card);border:1px solid var(--border);border-radius:20px;padding:3px 10px;margin-top:6px;cursor:default;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:livePulse 2s ease-in-out infinite;flex-shrink:0;}
+@keyframes livePulse{0%,100%{opacity:1}50%{opacity:.3}}
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:flex-end;justify-content:center;}
+.modal{background:var(--card);border-radius:18px 18px 0 0;padding:20px 16px calc(20px + var(--safe-bottom));width:100%;max-width:600px;max-height:85dvh;overflow-y:auto;}
+.modal-title{font-size:17px;font-weight:600;color:var(--accent);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;}
+.modal-close{background:none;border:none;color:var(--dim);font-size:22px;cursor:pointer;padding:0 4px;}
+/* Stat grid */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;}.stat-num{font-size:28px;font-weight:700;color:var(--accent);}.stat-label{font-size:12px;color:var(--dim);margin-top:2px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card,.task-item,.hist-item,.emp-card,.stat-card{animation:fadeUp .22s ease-out;}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div id="toast" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:10px 24px;border-radius:10px;font-size:14px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;"></div>
+<div id="modalRoot"></div>
+<script>
+let API_URL = localStorage.getItem('kitchenChecklist_api') || '';
+const app = document.getElementById('app');
+
+function gp(){const p=new URLSearchParams(location.search);return{code:p.get('code'),admin:p.get('admin')};}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function toast(m,e){const t=document.getElementById('toast');t.textContent=m;t.style.background=e?'var(--red)':'var(--green)';t.style.opacity='1';setTimeout(()=>t.style.opacity='0',2800);}
+
+function apiGet(a,p={}){return new Promise((res,rej)=>{
+  const cb='_c'+Math.random().toString(36).slice(2);
+  const qs=new URLSearchParams({action:a,callback:cb,...p}).toString();
+  window[cb]=d=>{delete window[cb];document.getElementById('_j')?.remove();res(d);};
+  const s=document.createElement('script');s.id='_j';s.src=API_URL+'?'+qs;
+  s.onerror=()=>{delete window[cb];rej(new Error('API Error'));};document.body.appendChild(s);
+});}
+function apiPost(d){return fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(d)}).then(r=>r.json());}
+
+// Image compression
+function compressImage(file, maxPx=900){
+  return new Promise(res=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        let w=img.width,h=img.height;
+        if(w>maxPx||h>maxPx){if(w>h){h=Math.round(h*maxPx/w);w=maxPx;}else{w=Math.round(w*maxPx/h);h=maxPx;}}
+        const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        res(canvas.toDataURL('image/jpeg',0.82));
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+const {code, admin} = gp();
+function init(){if(!API_URL)renderSetup();else if(admin)renderAdmin();else if(code)renderEmployee(code);else renderLanding();}
+
+// =========================================
+// SETUP & LANDING
+// =========================================
+function renderSetup(){
+  app.innerHTML=`<div class="header"><small>Kitchen Checklist</small><h1>הגדרת מערכת</h1></div>
+  <div class="setup"><h2>🔗 חיבור ל-Google Sheets</h2><div class="hint">הדבק את ה-URL של Apps Script Web App</div>
+  <input class="input" type="url" id="apiInput" placeholder="https://script.google.com/macros/s/..." dir="ltr" style="margin-bottom:12px;">
+  <button class="btn" onclick="saveApi()">חבר</button></div>`;}
+
+function saveApi(){
+  const u=document.getElementById('apiInput').value.trim();
+  let ok=false;try{ok=new URL(u).hostname==='script.google.com';}catch{}
+  if(!ok){toast('כתובת לא תקינה',1);return;}
+  API_URL=u;localStorage.setItem('kitchenChecklist_api',u);toast('מחובר!');setTimeout(()=>location.reload(),500);
+}
+
+function renderLanding(){
+  app.innerHTML=`<div class="header"><small>Kitchen Checklist</small><h1>צ׳קליסט מטבח</h1></div>
+  <div class="card" style="text-align:center;">
+    <div style="font-size:36px;margin-bottom:12px;">🍳</div>
+    <div style="font-size:17px;font-weight:600;margin-bottom:6px;">כניסת עובד</div>
+    <div style="font-size:13px;color:var(--dim);margin-bottom:20px;">הכנס את קוד הזיהוי שלך</div>
+    <input class="input" id="codeInput" placeholder="קוד אישי" style="text-align:center;font-size:20px;letter-spacing:4px;margin-bottom:12px;" maxlength="10">
+    <button class="btn" onclick="enterCode()">כניסה</button>
+  </div>
+  <div style="margin-top:16px;text-align:center;">
+    <button class="btn btn-outline btn-sm" style="width:auto;" onclick="location.href='?admin=1'">כניסת מנהל</button>
+    <button class="btn btn-outline btn-sm" style="width:auto;margin-right:8px;" onclick="localStorage.removeItem('kitchenChecklist_api');location.reload();">שנה API</button>
+  </div>`;}
+
+async function enterCode(){
+  const c=document.getElementById('codeInput').value.trim();
+  if(!c){toast('הכנס קוד',1);return;}
+  location.href='?code='+encodeURIComponent(c);
+}
+
+// =========================================
+// EMPLOYEE
+// =========================================
+let empName='', empCode='', submissionId=null, tasks=[], completedItems={}, empTab='type', selectedType='';
+
+async function renderEmployee(c){
+  empCode=c;
+  app.innerHTML=`<div class="loading"><div class="spin"></div><div style="margin-top:12px;">טוען...</div></div>`;
+  try{
+    const emp=await apiGet('identify',{code:c});
+    if(emp.error){app.innerHTML=`<div class="empty-state"><div class="icon">❌</div><p>קוד לא מזוהה</p><button class="btn btn-outline btn-sm" style="width:auto;margin-top:16px;" onclick="location.href='?'">חזור</button></div>`;return;}
+    empName=emp.name;
+    renderEmpTypeSelect();
+    startEmpPolling(c);
+  }catch(err){app.innerHTML=`<div class="empty-state"><div class="icon">⚠️</div><p>${esc(err.message)}</p></div>`;}
+}
+
+function renderEmpTypeSelect(){
+  app.innerHTML=`
+  <div class="header"><small>Kitchen Checklist</small><h1>צ׳קליסט מטבח</h1><div class="live-badge" id="liveBadge"><span class="live-dot"></span>Live</div></div>
+  <div class="greeting"><div class="name">היי ${esc(empName)} 👋</div><div class="info">בחר/י סוג משמרת</div></div>
+  <div class="type-grid">
+    <div class="type-card" onclick="startChecklist('פתיחה')">
+      <div class="type-icon">☀️</div>
+      <div class="type-name">פתיחה</div>
+      <div class="type-sub">תחילת יום</div>
+    </div>
+    <div class="type-card" onclick="startChecklist('סגירה')">
+      <div class="type-icon">🌙</div>
+      <div class="type-name">סגירה</div>
+      <div class="type-sub">סיום יום</div>
+    </div>
+  </div>
+  <div style="text-align:center;"><button class="btn btn-outline btn-sm" style="width:auto;" onclick="location.href='?'">יציאה</button></div>`;}
+
+async function startChecklist(type){
+  selectedType=type;
+  completedItems={};submissionId=null;
+  app.innerHTML=`<div class="loading"><div class="spin"></div><div style="margin-top:12px;">מכין צ׳קליסט...</div></div>`;
+  try{
+    const[startRes, tasksRes]=await Promise.all([
+      apiPost({action:'start_submission',code:empCode,type}),
+      apiGet('tasks',{type})
+    ]);
+    if(startRes.error){
+      if(startRes.existingId){
+        app.innerHTML=`<div class="empty-state"><div class="icon">✅</div><p>${type} כבר הוגשה היום</p><button class="btn btn-outline btn-sm" style="width:auto;margin-top:16px;" onclick="renderEmpTypeSelect()">חזור</button></div>`;
+      }else{
+        toast(startRes.error,1);renderEmpTypeSelect();
+      }
+      return;
+    }
+    submissionId=startRes.id;
+    tasks=tasksRes||[];
+    renderChecklist();
+  }catch(err){toast('שגיאה',1);renderEmpTypeSelect();}
+}
+
+function renderChecklist(){
+  const done=Object.keys(completedItems).length;
+  const total=tasks.length;
+  const pct=total?Math.round(done/total*100):0;
+  const allDone=done===total&&total>0;
+
+  let html=`
+  <div class="header"><small>Kitchen Checklist</small><h1>${selectedType==='פתיחה'?'☀️ פתיחה':'🌙 סגירה'}</h1><div class="sub">${esc(empName)}</div></div>
+  <div class="progress-label">הושלמו <strong>${done}</strong> מתוך <strong>${total}</strong> משימות</div>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pct}%"></div></div>`;
+
+  tasks.forEach(t=>{
+    const isDone=!!completedItems[t.id];
+    const typeLabel=t.type==='פתיחה'?'פתיחה':t.type==='סגירה'?'סגירה':'';
+    html+=`<div class="task-item ${isDone?'done':''}" id="task_${t.id}">
+      <div class="task-header" onclick="toggleTaskBody('${t.id}')">
+        <div class="task-check">${isDone?'✓':''}</div>
+        <div class="task-name">${esc(t.name)}</div>
+        ${typeLabel?`<div class="task-badge">${typeLabel}</div>`:''}
+      </div>
+      <div class="task-body" id="body_${t.id}" style="${isDone?'':'display:none'}">
+        ${isDone
+          ? t.photoRequired && completedItems[t.id]?.photoUrl
+            ? `<img class="photo-preview visible" src="${esc(completedItems[t.id].photoUrl)}" alt="תמונה">
+               <button class="btn btn-outline btn-sm" style="margin-top:6px;" onclick="retakePhoto('${t.id}')">📷 צלם שוב</button>`
+            : `<div style="color:var(--green);font-size:14px;padding:4px 0;">✓ הושלם</div>
+               <button class="btn btn-outline btn-sm" style="margin-top:4px;" onclick="undoTask('${t.id}')">↩ בטל סימון</button>`
+          : t.photoRequired
+            ? `<div class="photo-area">
+                 <div class="upload-btn" id="upbtn_${t.id}" onclick="triggerPhoto('${t.id}')">
+                   <span>📷</span><span>צלם / העלה תמונה</span>
+                 </div>
+                 <input type="file" accept="image/*" capture="environment" id="fileinput_${t.id}" style="display:none" onchange="handlePhoto('${t.id}',this)">
+               </div>`
+            : `<button class="btn btn-outline" style="margin-top:4px;" onclick="markDoneNoPhoto('${t.id}')">✓ סמן כבוצע</button>`
+        }
+      </div>
+    </div>`;
+  });
+
+  html+=`<div style="height:80px;"></div>
+  <div class="submit-bar"><div class="inner">
+    <button class="btn btn-green" id="submitBtn" ${allDone?'':'disabled'} onclick="submitChecklist()">
+      ${allDone?'✅ שלח צ׳קליסט':'ממתין לסיום כל המשימות'}
+    </button>
+  </div></div>`;
+
+  app.innerHTML=html;
+
+  // Re-open bodies for done items
+  tasks.forEach(t=>{if(completedItems[t.id])document.getElementById('body_'+t.id).style.display='block';});
+}
+
+function toggleTaskBody(id){
+  const b=document.getElementById('body_'+id);
+  if(b)b.style.display=b.style.display==='none'?'block':'none';
+}
+
+function triggerPhoto(taskId){
+  document.getElementById('fileinput_'+taskId)?.click();
+}
+
+function retakePhoto(taskId){
+  delete completedItems[taskId];
+  renderChecklist();
+  setTimeout(()=>{
+    document.getElementById('body_'+taskId).style.display='block';
+    triggerPhoto(taskId);
+  },100);
+}
+
+async function handlePhoto(taskId, input){
+  if(!input.files||!input.files[0])return;
+  const file=input.files[0];
+  const btn=document.getElementById('upbtn_'+taskId);
+  if(btn){btn.classList.add('uploading');btn.innerHTML=`<span class="upload-spinner"></span><span>מעלה תמונה...</span>`;}
+  try{
+    const compressed=await compressImage(file);
+    const task=tasks.find(t=>t.id===taskId);
+    const uploadRes=await apiPost({action:'upload_photo',submissionId,taskId,taskName:task?.name||taskId,employeeName:empName,imageData:compressed});
+    if(!uploadRes.success)throw new Error(uploadRes.error||'Upload failed');
+    const photoUrl=uploadRes.url;
+    await apiPost({action:'complete_item',submissionId,taskId,taskName:task?.name||taskId,photoUrl});
+    completedItems[taskId]={photoUrl};
+    toast('✅ '+( task?.name||'משימה')+' הושלמה!');
+    renderChecklist();
+    setTimeout(()=>{document.getElementById('body_'+taskId).style.display='block';},50);
+  }catch(err){
+    if(btn){btn.classList.remove('uploading');btn.innerHTML=`<span>📷</span><span>צלם / העלה תמונה</span>`;}
+    toast('שגיאה בהעלאה',1);
+  }
+}
+
+async function markDoneNoPhoto(taskId){
+  const el=document.querySelector(`#task_${taskId} .btn`);
+  if(el){el.disabled=true;el.textContent='מסמן...';}
+  try{
+    const task=tasks.find(t=>t.id===taskId);
+    await apiPost({action:'complete_item',submissionId,taskId,taskName:task?.name||taskId,photoUrl:''});
+    completedItems[taskId]={photoUrl:''};
+    toast('✓ '+(task?.name||'משימה')+' הושלמה!');
+    renderChecklist();
+    setTimeout(()=>{document.getElementById('body_'+taskId).style.display='block';},50);
+  }catch(err){if(el){el.disabled=false;el.textContent='✓ סמן כבוצע';}toast('שגיאה',1);}
+}
+
+function undoTask(taskId){
+  delete completedItems[taskId];
+  renderChecklist();
+  setTimeout(()=>{document.getElementById('body_'+taskId).style.display='block';},50);
+}
+
+async function submitChecklist(){
+  const btn=document.getElementById('submitBtn');
+  if(btn){btn.disabled=true;btn.textContent='שולח...';}
+  try{
+    await apiPost({action:'submit_checklist',submissionId});
+    app.innerHTML=`<div style="text-align:center;padding:60px 20px;">
+      <div style="font-size:64px;margin-bottom:16px;">✅</div>
+      <div style="font-size:22px;font-weight:600;color:var(--green);margin-bottom:8px;">הצ׳קליסט הושלם!</div>
+      <div style="font-size:14px;color:var(--dim);margin-bottom:32px;">${selectedType} ${new Date().toLocaleDateString('he-IL')} — ${esc(empName)}</div>
+      <button class="btn btn-outline" style="max-width:280px;" onclick="renderEmpTypeSelect()">חזור לתפריט</button>
+    </div>`;
+  }catch(err){if(btn){btn.disabled=false;btn.textContent='✅ שלח צ׳קליסט';}toast('שגיאה',1);}
+}
+
+// =========================================
+// ADMIN
+// =========================================
+let aTab='today', aD={};
+
+async function renderAdmin(){
+  app.innerHTML=`<div class="loading"><div class="spin"></div><div style="margin-top:12px;">טוען...</div></div>`;
+  try{
+    const[cfg,emps,today]=await Promise.all([apiGet('config'),apiGet('employees'),apiGet('today_summary')]);
+    aD={config:cfg,employees:emps,todaySummary:today};
+    renderAUI();startAdminPolling();
+  }catch(err){app.innerHTML=`<div class="empty-state"><div class="icon">⚠️</div><p>${esc(err.message)}</p><button class="btn btn-sm" style="margin-top:16px;width:auto;" onclick="renderAdmin()">נסה שוב</button></div>`;}
+}
+
+async function renderAUI(){
+  const{config:cfg,employees:emps,todaySummary:today}=aD;
+  const todayDone=today?today.filter(e=>(e.open?.status==='הושלם')||(e.close?.status==='הושלם')).length:0;
+
+  let html=`<div class="header"><small>Kitchen Checklist</small><h1>דשבורד מנהל</h1>
+  <div class="sub">${new Date().toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long'})}</div>
+  <div class="live-badge" id="liveBadge"><span class="live-dot"></span>Live</div></div>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-num">${emps?.length||0}</div><div class="stat-label">עובדים</div></div>
+    <div class="stat-card"><div class="stat-num">${todayDone}</div><div class="stat-label">הגישו היום</div></div>
+  </div>
+  <div class="tabs">
+    ${[['today','📅 היום'],['history','📋 היסטוריה'],['tasks','✅ משימות'],['settings','⚙️ הגדרות']].map(([t,l])=>`<button class="tab ${aTab===t?'active':''}" onclick="aTab='${t}';renderAUI()">${l}</button>`).join('')}
+  </div>`;
+
+  // TODAY
+  if(aTab==='today'){
+    if(!today||!today.length){html+=`<div class="card" style="text-align:center;color:var(--dim);">אין עובדים רשומים</div>`;}
+    else{
+      html+=`<div class="card">`;
+      today.forEach(e=>{
+        const openBadge=e.open?.status==='הושלם'
+          ?`<span class="badge done" onclick="viewSubmission('${e.open.id}','${esc(e.name)}','פתיחה')">☀️ פתיחה ✓</span>`
+          :e.open?.status==='בתהליך'
+            ?`<span class="badge inprog">☀️ בתהליך</span>`
+            :`<span class="badge missing">☀️ פתיחה</span>`;
+        const closeBadge=e.close?.status==='הושלם'
+          ?`<span class="badge done" onclick="viewSubmission('${e.close.id}','${esc(e.name)}','סגירה')">🌙 סגירה ✓</span>`
+          :e.close?.status==='בתהליך'
+            ?`<span class="badge inprog">🌙 בתהליך</span>`
+            :`<span class="badge missing">🌙 סגירה</span>`;
+        html+=`<div class="summary-row">
+          <div class="summary-avatar">${esc(e.name.charAt(0))}</div>
+          <div class="summary-name">${esc(e.name)}</div>
+          <div class="summary-badges">${openBadge}${closeBadge}</div>
+        </div>`;
+      });
+      html+=`</div>`;
+    }
+  }
+
+  // HISTORY
+  if(aTab==='history'){
+    html+=`<div class="card">
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <input type="date" class="input input-sm" id="histDate" style="flex:1;" onchange="loadHistory()">
+        <select class="input input-sm" id="histCode" style="flex:1;" onchange="loadHistory()">
+          <option value="">כל העובדים</option>
+          ${(emps||[]).map(e=>`<option value="${esc(e.code)}">${esc(e.name)}</option>`).join('')}
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="document.getElementById('histDate').value='';loadHistory()">הכל</button>
+      </div>
+      <div id="histList"><div class="loading" style="padding:20px;"><div class="spin"></div></div></div>
+    </div>`;
+  }
+
+  // TASKS
+  if(aTab==='tasks'){
+    try{
+      if(!aD.tasks){const _r=await apiGet('all_tasks');aD.tasks=Array.isArray(_r)?_r:(await apiGet('tasks'));}
+      html+=`<div class="card"><div class="card-title">✅ ניהול משימות</div>
+      <div id="taskManageList">`;
+      (aD.tasks||[]).forEach(t=>{
+        html+=`<div class="task-manage-row">
+          <span class="task-type-pill">${t.type}</span>
+          <span class="task-manage-name">${esc(t.name)}</span>
+          <span title="${t.photoRequired?'צילום חובה — לחץ לביטול':'ללא צילום — לחץ להפעלה'}" style="font-size:16px;cursor:pointer;opacity:${t.photoRequired?'1':'0.3'};" onclick="togglePhotoReq('${t.id}',${!!t.photoRequired})">📷</span>
+          <button class="btn btn-outline btn-sm" style="font-size:11px;padding:5px 8px;" onclick="editTask('${t.id}','${esc(t.name)}','${esc(t.type)}',${!!t.photoRequired})">✏️</button>
+          <button class="toggle ${t.active?'on':'off'}" onclick="toggleTask('${t.id}',this)"></button>
+          <span style="color:var(--red);cursor:pointer;font-size:18px;padding:0 4px;" onclick="deleteTask('${t.id}')">🗑️</span>
+        </div>`;
+      });
+      html+=`</div>
+      <div class="section-divider"></div>
+      <button class="btn btn-outline btn-sm" onclick="addTaskModal()">+ הוסף משימה</button></div>`;
+    }catch(e){html+=`<div class="card" style="color:var(--red);">שגיאה בטעינת משימות</div>`;}
+  }
+
+  // SETTINGS
+  if(aTab==='settings'){
+    html+=`<div class="card"><div class="card-title">👥 ניהול עובדים</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;"><input class="input input-sm" id="newEmpName" placeholder="שם עובד/ת" style="flex:1;"><button class="btn btn-green btn-sm" onclick="addEmp()">הוסף</button></div>`;
+    (emps||[]).forEach(e=>{
+      html+=`<div class="emp-card"><div class="emp-avatar">${esc(e.name.charAt(0))}</div>
+        <div class="emp-info"><div class="emp-name">${esc(e.name)}</div><div class="emp-code">${esc(e.code)}</div></div>
+        <div style="font-size:11px;color:var(--blue);cursor:pointer;margin-left:auto;margin-right:8px;" onclick="cpCode('${esc(e.code)}','${esc(e.name)}')">📋 קישור</div>
+        <div class="emp-del" data-code="${esc(e.code)}" data-name="${esc(e.name)}" onclick="rmEmp(this.dataset.code,this.dataset.name)">🗑️</div>
+      </div>`;
+    });
+    html+=`</div>
+    <div class="card"><div class="card-title">🔗 API</div>
+    <div style="font-size:11px;color:var(--dim);word-break:break-all;margin-bottom:8px;">${API_URL}</div>
+    <button class="btn btn-outline btn-sm" onclick="localStorage.removeItem('kitchenChecklist_api');location.reload();">שנה</button></div>`;
+  }
+
+  html+=`<div style="margin-top:16px;text-align:center;"><button class="btn btn-outline btn-sm" style="width:auto;" onclick="renderAdmin()">🔄 רענן</button></div>`;
+  app.innerHTML=html;
+
+  if(aTab==='history') loadHistory();
+  if(aTab==='tasks' && !aD.tasks){aD.tasks=await apiGet('tasks');renderAUI();}
+}
+
+function _todayLocal(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+
+async function loadHistory(){
+  const inp=document.getElementById('histDate');
+  if(inp&&!inp.value) inp.value=_todayLocal();
+  const date=inp?.value||'';
+  const code=document.getElementById('histCode')?.value||'';
+  const list=document.getElementById('histList');
+  if(!list)return;
+  list.innerHTML=`<div class="loading" style="padding:20px;"><div class="spin"></div></div>`;
+  const subs=await apiGet('history',{date,code});
+  if(!subs||!subs.length){list.innerHTML=`<div style="text-align:center;color:var(--dim);padding:20px;">אין הגשות</div>`;return;}
+  list.innerHTML=subs.map(s=>`
+    <div class="hist-item" onclick="viewSubmission('${s.id}','${esc(s.name)}','${esc(s.type)}')">
+      <div class="hist-item-head">
+        <div class="hist-name">${esc(s.name)}</div>
+        <span class="hist-type ${s.type==='פתיחה'?'open':'close'}">${s.type}</span>
+        <div class="hist-time">${esc(s.date)}</div>
+      </div>
+      <div style="font-size:12px;color:var(--dim);margin-top:4px;">${esc(s.timestamp)}</div>
+    </div>`).join('');
+}
+
+async function viewSubmission(id,name,type){
+  openModal('טוען...',`<div class="loading"><div class="spin"></div></div>`);
+  const items=await apiGet('submission_detail',{id});
+  openModal(`${type} — ${name}`,
+    items.length
+      ? `<div class="photo-grid">${items.map(item=>`
+          <div class="photo-tile">
+            <img src="${esc(item.photoUrl)}" alt="${esc(item.taskName)}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22120%22><rect fill=%22%233a3428%22 width=%22100%25%22 height=%22100%25%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22%239a9080%22 text-anchor=%22middle%22 dy=%22.3em%22>📷</text></svg>'">
+            <div class="photo-tile-label">✓ ${esc(item.taskName)}</div>
+          </div>`).join('')}
+        </div>`
+      : `<div class="empty-state" style="padding:20px;"><div class="icon">📭</div><p>אין פריטים</p></div>`
+  );
+}
+
+function openModal(title,content){
+  const root=document.getElementById('modalRoot');
+  root.innerHTML=`<div class="modal-bg" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-title">${esc(title)}<button class="modal-close" onclick="closeModal()">✕</button></div>
+      <div id="modalBody">${content}</div>
+    </div></div>`;
+}
+function closeModal(){document.getElementById('modalRoot').innerHTML='';}
+
+// Tasks management
+async function togglePhotoReq(id, current){
+  const res=await apiPost({action:'edit_task',id,photoRequired:!current});
+  if(res.success){const t=(aD.tasks||[]).find(x=>x.id===id);if(t)t.photoRequired=!current;renderAUI();}
+  else toast('שגיאה',1);
+}
+
+async function toggleTask(id,btn){
+  const res=await apiPost({action:'toggle_task',id});
+  if(res.success){btn.className='toggle '+(res.active?'on':'off');if(aD.tasks){const t=aD.tasks.find(x=>x.id===id);if(t)t.active=res.active;}}
+  else toast('שגיאה',1);
+}
+
+async function deleteTask(id){
+  if(!confirm('למחוק משימה זו?'))return;
+  const res=await apiPost({action:'delete_task',id});
+  if(res.success){aD.tasks=(aD.tasks||[]).filter(t=>t.id!==id);renderAUI();}
+  else toast('שגיאה',1);
+}
+
+function editTask(id,name,type,photoReq){
+  const pr=photoReq===true||photoReq==='true';
+  openModal('עריכת משימה',`
+    <label class="label">שם משימה</label>
+    <input class="input" id="editName" value="${esc(name)}" style="margin-bottom:12px;">
+    <label class="label">סוג</label>
+    <select class="input" id="editType" style="margin-bottom:12px;">
+      ${['שניהם','פתיחה','סגירה'].map(t=>`<option value="${t}" ${t===type?'selected':''}>${t}</option>`).join('')}
+    </select>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;margin-bottom:16px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+      <span style="font-size:14px;">📷 צילום חובה</span>
+      <button class="toggle ${pr?'on':'off'}" id="editPhotoReq" onclick="this.classList.toggle('on');this.classList.toggle('off');"></button>
+    </div>
+    <button class="btn" onclick="saveEditTask('${id}')">שמור</button>`);
+}
+
+async function saveEditTask(id){
+  const name=document.getElementById('editName').value.trim();
+  const type=document.getElementById('editType').value;
+  const photoRequired=document.getElementById('editPhotoReq')?.classList.contains('on');
+  if(!name){toast('שם ריק',1);return;}
+  const res=await apiPost({action:'edit_task',id,name,type,photoRequired});
+  if(res.success){const t=(aD.tasks||[]).find(x=>x.id===id);if(t){t.name=name;t.type=type;t.photoRequired=photoRequired;}closeModal();renderAUI();}
+  else toast('שגיאה',1);
+}
+
+function addTaskModal(){
+  openModal('משימה חדשה',`
+    <label class="label">שם משימה</label>
+    <input class="input" id="newTaskName" placeholder="למשל: ניקוי תנור" style="margin-bottom:12px;">
+    <label class="label">סוג</label>
+    <select class="input" id="newTaskType" style="margin-bottom:12px;">
+      <option value="שניהם">שניהם (פתיחה + סגירה)</option>
+      <option value="פתיחה">פתיחה בלבד</option>
+      <option value="סגירה">סגירה בלבד</option>
+    </select>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;margin-bottom:16px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+      <span style="font-size:14px;">📷 צילום חובה</span>
+      <button class="toggle on" id="newPhotoReq" onclick="this.classList.toggle('on');this.classList.toggle('off');"></button>
+    </div>
+    <button class="btn" onclick="saveNewTask()">הוסף</button>`);
+}
+
+async function saveNewTask(){
+  const name=document.getElementById('newTaskName').value.trim();
+  const type=document.getElementById('newTaskType').value;
+  const photoRequired=document.getElementById('newPhotoReq')?.classList.contains('on');
+  if(!name){toast('שם ריק',1);return;}
+  const res=await apiPost({action:'add_task',name,type,photoRequired});
+  if(res.success){aD.tasks=null;closeModal();aTab='tasks';renderAUI();}
+  else toast('שגיאה',1);
+}
+
+// Employees management
+async function addEmp(){
+  const inp=document.getElementById('newEmpName');const n=inp?.value.trim();
+  if(!n){toast('הכנס שם',1);return;}
+  const res=await apiPost({action:'add_employee',name:n});
+  if(res.error){toast(res.error,1);return;}
+  aD.employees=[...(aD.employees||[]),{name:res.name,code:res.code}];
+  toast(n+' נוסף/ה! 🎉');inp.value='';renderAUI();
+}
+
+async function rmEmp(code,name){
+  if(!confirm('למחוק את '+name+'?'))return;
+  const res=await apiPost({action:'remove_employee',code});
+  if(res.success){aD.employees=(aD.employees||[]).filter(e=>e.code!==code);toast(name+' הוסר/ה');renderAUI();}
+  else toast('שגיאה',1);
+}
+
+function cpCode(code,name){
+  const base=location.origin+location.pathname;
+  const link=base+'?code='+code;
+  navigator.clipboard.writeText(link).then(()=>toast('קישור ל'+name+' הועתק! 📋')).catch(()=>toast(link));
+}
+
+// =========================================
+// LIVE POLLING
+// =========================================
+let _pollTimer=null,_pollMode=null,_pollCode=null;
+
+function stopPolling(){if(_pollTimer){clearTimeout(_pollTimer);_pollTimer=null;}_pollMode=null;_pollCode=null;}
+function _schedPoll(ms,fn){_pollTimer=setTimeout(async()=>{try{await fn();}catch(e){}if(_pollMode)_schedPoll(ms,fn);},ms);}
+function _setLiveBadge(){const el=document.getElementById('liveBadge');if(!el)return;const t=new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit',second:'2-digit'});el.innerHTML=`<span class="live-dot"></span>Live · ${t}`;}
+
+function startAdminPolling(){
+  if(_pollTimer)clearTimeout(_pollTimer);
+  _pollMode='admin';
+  _schedPoll(30000,async()=>{
+    const[today,emps]=await Promise.all([apiGet('today_summary'),apiGet('employees')]);
+    let ch=false;
+    if(JSON.stringify(today)!==JSON.stringify(aD.todaySummary)){aD.todaySummary=today;ch=true;}
+    if(JSON.stringify(emps)!==JSON.stringify(aD.employees)){aD.employees=emps;ch=true;}
+    _setLiveBadge();if(ch){toast('🔄 עודכן');renderAUI();}
+  });
+}
+
+function startEmpPolling(c){
+  if(_pollTimer)clearTimeout(_pollTimer);
+  _pollMode='emp';_pollCode=c;
+  _schedPoll(60000,async()=>{_setLiveBadge();});
+}
+
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){if(_pollTimer){clearTimeout(_pollTimer);_pollTimer=null;}}
+  else if(_pollMode==='admin')startAdminPolling();
+  else if(_pollMode==='emp'&&_pollCode)startEmpPolling(_pollCode);
+});
+
+init();
+</script>
+</body>
+</html>
